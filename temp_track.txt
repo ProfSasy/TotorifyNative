@@ -122,8 +122,8 @@ class TrackMatcherService {
         }
         
         do {
-            let cleanTitle = canonicalTitle(track.title)
-            let cleanArtist = canonicalArtist(track.artist).components(separatedBy: ",").first?.trimmingCharacters(in: .whitespaces) ?? ""
+            let cleanTitle = canonicalTitle(target.title)
+            let cleanArtist = canonicalArtist(target.artist).components(separatedBy: ",").first?.trimmingCharacters(in: .whitespaces) ?? ""
             
             let queryMusic = "\(cleanTitle) \(cleanArtist)"
             let queryTube = "\(track.title) \(track.artist) audio"
@@ -144,7 +144,7 @@ class TrackMatcherService {
             var bestScore = -999999
             
             for cand in allCandidates {
-                let score = scoreCandidate(candidate: cand, target: track)
+                let score = scoreCandidate(candidate: cand, target: target)
                 if score > bestScore {
                     bestScore = score
                     best = cand
@@ -164,8 +164,8 @@ class TrackMatcherService {
     
     func getAlternativeMatches(targetYTTrack: YTTrack, limit: Int = 12) async -> [ScoredTrackMatch] {
         do {
-            let cleanTitle = canonicalTitle(targetYTTrack.title)
-            let cleanArtist = canonicalArtist(targetYTTrack.artist).components(separatedBy: ",").first?.trimmingCharacters(in: .whitespaces) ?? ""
+            let cleanTitle = canonicalTitle(target.title)
+            let cleanArtist = canonicalArtist(target.artist).components(separatedBy: ",").first?.trimmingCharacters(in: .whitespaces) ?? ""
             let query = "\(cleanTitle) \(cleanArtist)"
             
             let results = await YTMusicService.shared.search(query: query)
@@ -221,3 +221,4 @@ class TrackMatcherService {
 
 
 }
+
