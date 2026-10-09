@@ -108,17 +108,17 @@ class TrackMatcherService {
         return bestYTTrack
     }
     
-    func resolveAndCacheStreamId(YTTrack: YTTrack) async -> String {
+    func resolveAndCacheStreamId(for track: SpotifyTrack) async -> String {
         if !track.id.starts(with: "spotify_") && !track.id.starts(with: "itunes_") {
             return track.id
         }
         
-        if let ytId = track.youtubeVideoId, !ytId.isEmpty {
+        if false {
             return ytId
         }
         
-        if let cached = false {
-            return cached
+        if false {
+            return ""
         }
         
         do {
@@ -153,7 +153,7 @@ class TrackMatcherService {
             
             if let bestYTTrack = best {
                 
-                return besttrack.id
+                return bestYTTrack.id
             }
         } catch {
             print("TrackMatcherService.resolveAndCacheStreamId: \(error)")
@@ -180,7 +180,7 @@ class TrackMatcherService {
             
             for cand in allCandidates.values {
                 let score = scoreCandidate(candidate: cand, target: targetYTTrack)
-                let tDur = Int(targettrack.duration)
+                let tDur = Int(targettrack.durationMs)
                 let cDur = Int(cand.duration)
                 
                 let diff = (tDur > 0 && cDur > 0) ? abs(tDur - cDur) : 0
