@@ -36,7 +36,6 @@ class AudioEngine: NSObject, ObservableObject, WKNavigationDelegate {
         
         webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = self
-        webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15" // AGGIRA I BLOCCHI MOBILE
     }
     
     func play(videoId: String, title: String = "Senza Titolo", artist: String = "Sconosciuto") {
@@ -44,16 +43,33 @@ class AudioEngine: NSObject, ObservableObject, WKNavigationDelegate {
         self.currentTitle = title
         self.currentArtist = artist
         
-        // Carica la pagina embed ufficiale, forzando l'autoplay tramite parametri URL
-        let urlString = "https://www.youtube.com/embed/\(videoId)?autoplay=1&playsinline=1&enablejsapi=1"
+        // Carichiamo la VERA pagina di YouTube, NON l'embed. 
+        // Questo distrugge completamente qualsiasi blocco "notEmbeddable" perché per i server di YouTube stiamo semplicemente visitando il sito!
+        let urlString = "https://m.youtube.com/watch?v=\(videoId)"
         guard let url = URL(string: urlString) else { return }
         
         var request = URLRequest(url: url)
-        request.setValue("https://www.youtube.com", forHTTPHeaderField: "Referer") // BYPASS BLOCCO EMBED
-        
         webView.load(request)
         isPlaying = true
         startPolling()
+    }
+    
+    // Implementiamo il delegate per forzare il play quando la pagina ha finito di caricare
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        // Appena la pagina carica, cerchiamo il tag <video> e forziamo la riproduzione ignorando il tap
+        let js = """
+        setTimeout(function() {
+            var v = document.querySelector('video');
+            if(v) { 
+                v.play(); 
+            } else {
+                // Su alcune interfacce mobile di youtube serve un click sul bottone play
+                var btn = document.querySelector('.ytp-large-play-button');
+                if(btn) btn.click();
+            }
+        }, 1000);
+        """
+        webView.evaluateJavaScript(js)
     }
     
     func pause() {
