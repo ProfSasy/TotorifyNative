@@ -54,7 +54,7 @@ struct HomeView: View {
                     } else {
                         // Picker "Popolari" / "Classifiche"
                         Picker("Filtro", selection: $filterIndex) {
-                            ForEach(0..<filters.count, id: \\.self) { index in
+                            ForEach(0..<filters.count, id: \.self) { index in
                                 Text(filters[index]).tag(index)
                             }
                         }
