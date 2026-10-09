@@ -1,0 +1,16 @@
+name: TotorifyNative
+options:
+  bundleIdPrefix: com.profsasy
+  deploymentTarget:
+    iOS: 15.0
+targets:
+  TotorifyNative:
+    type: application
+    platform: iOS
+    sources:
+      - path: IOS-SwiftUI-Template
+    settings:
+      CODE_SIGN_IDENTITY: ""
+      CODE_SIGNING_REQUIRED: NO
+      CODE_SIGNING_ALLOWED: NO
+      PRODUCT_BUNDLE_IDENTIFIER: com.profsasy.TotorifyNative

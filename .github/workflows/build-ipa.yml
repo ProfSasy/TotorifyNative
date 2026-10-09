@@ -17,11 +17,16 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode.app
 
+      - name: Generate Xcode Project
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
       - name: Build iOS App (No Codesign)
         run: |
           xcodebuild clean build \
-            -project IOS-SwiftUI-Template.xcodeproj \
-            -scheme "IOS-SwiftUI-Template" \
+            -project TotorifyNative.xcodeproj \
+            -scheme "TotorifyNative" \
             -sdk iphoneos \
             -configuration Release \
             CODE_SIGN_IDENTITY="" \

@@ -9,6 +9,9 @@ class AudioEngine: NSObject, ObservableObject, WKNavigationDelegate {
     @Published var isPlaying = false
     @Published var currentPosition: Double = 0
     @Published var duration: Double = 0
+    @Published var currentVideoId: String? = nil
+    @Published var currentTitle: String = "Senza Titolo"
+    @Published var currentArtist: String = "Sconosciuto"
     
     override init() {
         super.init()
@@ -36,7 +39,11 @@ class AudioEngine: NSObject, ObservableObject, WKNavigationDelegate {
         webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15" // AGGIRA I BLOCCHI MOBILE
     }
     
-    func play(videoId: String) {
+    func play(videoId: String, title: String = "Senza Titolo", artist: String = "Sconosciuto") {
+        self.currentVideoId = videoId
+        self.currentTitle = title
+        self.currentArtist = artist
+        
         // Carica la pagina embed ufficiale, forzando l'autoplay tramite parametri URL
         let urlString = "https://www.youtube.com/embed/\(videoId)?autoplay=1&playsinline=1&enablejsapi=1"
         guard let url = URL(string: urlString) else { return }
@@ -46,6 +53,7 @@ class AudioEngine: NSObject, ObservableObject, WKNavigationDelegate {
         
         webView.load(request)
         isPlaying = true
+        startPolling()
     }
     
     func pause() {
