@@ -31,7 +31,7 @@ class SearchViewModel: ObservableObject {
         }
         
         Task {
-            if let results = await SpotifyService.shared.searchTracks(query: query, limit: 15) {
+            if let results = await SpotifyService.shared.searchTracks(query: query) {
                 DispatchQueue.main.async {
                     self.searchResults = results
                     self.isSearching = false

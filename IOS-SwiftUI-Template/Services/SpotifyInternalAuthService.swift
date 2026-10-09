@@ -14,7 +14,7 @@ class SpotifyInternalAuthService {
     private init() {}
     
     func saveSpDcCookie(_ spDc: String) async {
-        await UserDefaults.standard.set(spDc, forKey: "spDcCookie")
+        UserDefaults.standard.set(spDc, forKey: "spDcCookie")
         accessToken = nil // Invalidate current token
     }
     

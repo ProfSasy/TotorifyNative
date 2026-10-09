@@ -52,7 +52,7 @@ class TrackMatcherService {
         return false
     }
     
-    func scoreCandidate(candidate: YTTrack, target: YTTrack) -> Int {
+    func scoreCandidate(candidate: YTTrack, target: SpotifyTrack) -> Int {
         var score = 0
         let targetTitle = canonicalTitle(target.title)
         let candTitle = canonicalTitle(candidate.title)
@@ -90,7 +90,7 @@ class TrackMatcherService {
         return score
     }
     
-    func pickBestMatch(candidates: [YTTrack], target: YTTrack) -> YTTrack? {
+    func pickBestMatch(candidates: [YTTrack], target: SpotifyTrack) -> YTTrack? {
         if candidates.isEmpty { return nil }
         if candidates.count == 1 { return candidates.first }
         
@@ -144,7 +144,7 @@ class TrackMatcherService {
             var bestScore = -999999
             
             for cand in allCandidates {
-                let score = scoreCandidate(candidate: cand, target: YTTrack)
+                let score = scoreCandidate(candidate: cand, target: target)
                 if score > bestScore {
                     bestScore = score
                     best = cand
@@ -164,8 +164,8 @@ class TrackMatcherService {
     
     func getAlternativeMatches(targetYTTrack: YTTrack, limit: Int = 12) async -> [ScoredTrackMatch] {
         do {
-            let cleanTitle = canonicalTitle(targettrack.title)
-            let cleanArtist = canonicalArtist(targettrack.artist).components(separatedBy: ",").first?.trimmingCharacters(in: .whitespaces) ?? ""
+            let cleanTitle = canonicalTitle(target.title)
+            let cleanArtist = canonicalArtist(target.artist).components(separatedBy: ",").first?.trimmingCharacters(in: .whitespaces) ?? ""
             let query = "\(cleanTitle) \(cleanArtist)"
             
             let results = await YTMusicService.shared.search(query: query)
@@ -180,7 +180,7 @@ class TrackMatcherService {
             
             for cand in allCandidates.values {
                 let score = scoreCandidate(candidate: cand, target: targetYTTrack)
-                let tDur = Int(targettrack.durationMs)
+                let tDur = Int(target.durationMs)
                 let cDur = Int(cand.duration)
                 
                 let diff = (tDur > 0 && cDur > 0) ? abs(tDur - cDur) : 0

@@ -144,7 +144,7 @@ struct HomeView: View {
     private func playTrack(track: SpotifyTrack) {
         Task {
             let id = await TrackMatcherService.shared.resolveAndCacheStreamId(for: track)
-            if let ytId = id {
+            let ytId = id; if true {
                 DispatchQueue.main.async {
                     AudioEngine.shared.play(videoId: ytId, title: track.title, artist: track.artist)
                 }
