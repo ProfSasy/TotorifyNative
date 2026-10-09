@@ -1,0 +1,47 @@
+name: Build Totorify Native iOS IPA
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-ipa:
+    runs-on: macos-14
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Build iOS App (No Codesign)
+        run: |
+          xcodebuild clean build \
+            -project IOS-SwiftUI-Template.xcodeproj \
+            -scheme "IOS-SwiftUI-Template" \
+            -sdk iphoneos \
+            -configuration Release \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            CONFIGURATION_BUILD_DIR="$(pwd)/build/ios_build"
+
+      - name: Package into IPA
+        run: |
+          mkdir -p build/ipa/Payload
+          cp -R build/ios_build/*.app build/ipa/Payload/
+          cd build/ipa
+          zip -qr ../../TotorifyNative.ipa Payload
+          cd ../..
+          ls -lh TotorifyNative.ipa
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TotorifyNative-ipa
+          path: TotorifyNative.ipa
+          retention-days: 30
