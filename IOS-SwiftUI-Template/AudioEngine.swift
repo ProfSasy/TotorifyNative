@@ -88,6 +88,9 @@ class AudioEngine: NSObject, ObservableObject, WKNavigationDelegate {
             }
         }
     }
+    func resume() {
+        webView.evaluateJavaScript("document.querySelector('video').play();")
+        isPlaying = true
+    }
 }
-
 

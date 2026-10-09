@@ -98,7 +98,7 @@ class TrackMatcherService {
         var highestScore = -999999
         
         for cand in candidates {
-            let s = scoreCandidate(candidate: cand, target: track)
+            let s = scoreCandidate(candidate: cand, target: target)
             if s > highestScore {
                 highestScore = s
                 bestYTTrack = cand
@@ -114,7 +114,7 @@ class TrackMatcherService {
         }
         
         if false {
-            return ytId
+            return ""
         }
         
         if false {
@@ -144,7 +144,7 @@ class TrackMatcherService {
             var bestScore = -999999
             
             for cand in allCandidates {
-                let score = scoreCandidate(candidate: cand, target: track)
+                let score = scoreCandidate(candidate: cand, target: target)
                 if score > bestScore {
                     bestScore = score
                     best = cand
@@ -212,8 +212,6 @@ class TrackMatcherService {
             return []
         }
     }
-}
-
     func scoreCandidate(candidate: YTTrack, target: YTTrack) -> Int {
         let cDur = candidate.duration
         let tDur = target.duration
@@ -221,3 +219,5 @@ class TrackMatcherService {
         return diff
     }
 
+
+}
