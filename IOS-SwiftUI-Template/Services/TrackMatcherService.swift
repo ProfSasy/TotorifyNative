@@ -1,7 +1,7 @@
 import Foundation
 
 struct ScoredTrackMatch {
-    let song: Song
+    let YTTrack: YTTrack
     let score: Int
     let durationDiffSeconds: Int
     let qualityLabel: String
@@ -52,7 +52,7 @@ class TrackMatcherService {
         return false
     }
     
-    func scoreCandidate(candidate: Song, target: Song) -> Int {
+    func scoreCandidate(candidate: YTTrack, target: YTTrack) -> Int {
         var score = 0
         let targetTitle = canonicalTitle(target.title)
         let candTitle = canonicalTitle(candidate.title)
@@ -90,43 +90,43 @@ class TrackMatcherService {
         return score
     }
     
-    func pickBestMatch(candidates: [Song], target: Song) -> Song? {
+    func pickBestMatch(candidates: [YTTrack], target: YTTrack) -> YTTrack? {
         if candidates.isEmpty { return nil }
         if candidates.count == 1 { return candidates.first }
         
-        var bestSong = candidates.first!
+        var bestYTTrack = candidates.first!
         var highestScore = -999999
         
         for cand in candidates {
             let s = scoreCandidate(candidate: cand, target: target)
             if s > highestScore {
                 highestScore = s
-                bestSong = cand
+                bestYTTrack = cand
             }
         }
         
-        return bestSong
+        return bestYTTrack
     }
     
-    func resolveAndCacheStreamId(song: Song) async -> String {
-        if !song.id.starts(with: "spotify_") && !song.id.starts(with: "itunes_") {
-            return song.id
+    func resolveAndCacheStreamId(YTTrack: YTTrack) async -> String {
+        if !YTTrack.id.starts(with: "spotify_") && !YTTrack.id.starts(with: "itunes_") {
+            return YTTrack.id
         }
         
-        if let ytId = song.youtubeVideoId, !ytId.isEmpty {
+        if let ytId = YTTrack.youtubeVideoId, !ytId.isEmpty {
             return ytId
         }
         
-        if let cached = StorageService.shared.getCachedYouTubeMapping(songId: song.id), !cached.isEmpty {
+        if let cached = StorageService.shared.getCachedYouTubeMapping(YTTrackId: YTTrack.id), !cached.isEmpty {
             return cached
         }
         
         do {
-            let cleanTitle = canonicalTitle(song.title)
-            let cleanArtist = canonicalArtist(song.artist).components(separatedBy: ",").first?.trimmingCharacters(in: .whitespaces) ?? ""
+            let cleanTitle = canonicalTitle(YTTrack.title)
+            let cleanArtist = canonicalArtist(YTTrack.artist).components(separatedBy: ",").first?.trimmingCharacters(in: .whitespaces) ?? ""
             
             let queryMusic = "\(cleanTitle) \(cleanArtist)"
-            let queryTube = "\(song.title) \(song.artist) audio"
+            let queryTube = "\(YTTrack.title) \(YTTrack.artist) audio"
             
             let musicResults = await YTMusicService.shared.search(query: queryMusic)
             var allCandidates = musicResults
@@ -137,42 +137,42 @@ class TrackMatcherService {
             }
             
             if allCandidates.isEmpty {
-                return song.id
+                return YTTrack.id
             }
             
-            var best: Song?
+            var best: YTTrack?
             var bestScore = -999999
             
             for cand in allCandidates {
-                let score = scoreCandidate(candidate: cand, target: song)
+                let score = scoreCandidate(candidate: cand, target: YTTrack)
                 if score > bestScore {
                     bestScore = score
                     best = cand
                 }
             }
             
-            if let bestSong = best {
-                PlaybackLogService.shared.log(component: "MATCHER", message: "Match Trovato per \(song.title): \(bestSong.title) (Score: \(bestScore))")
-                await StorageService.shared.cacheYouTubeMapping(songId: song.id, ytId: bestSong.id)
-                return bestSong.id
+            if let bestYTTrack = best {
+                PlaybackLogService.shared.log(component: "MATCHER", message: "Match Trovato per \(YTTrack.title): \(bestYTTrack.title) (Score: \(bestScore))")
+                await StorageService.shared.cacheYouTubeMapping(YTTrackId: YTTrack.id, ytId: bestYTTrack.id)
+                return bestYTTrack.id
             }
         } catch {
             print("TrackMatcherService.resolveAndCacheStreamId: \(error)")
         }
         
-        return song.id
+        return YTTrack.id
     }
     
-    func getAlternativeMatches(targetSong: Song, limit: Int = 12) async -> [ScoredTrackMatch] {
+    func getAlternativeMatches(targetYTTrack: YTTrack, limit: Int = 12) async -> [ScoredTrackMatch] {
         do {
-            let cleanTitle = canonicalTitle(targetSong.title)
-            let cleanArtist = canonicalArtist(targetSong.artist).components(separatedBy: ",").first?.trimmingCharacters(in: .whitespaces) ?? ""
+            let cleanTitle = canonicalTitle(targetYTTrack.title)
+            let cleanArtist = canonicalArtist(targetYTTrack.artist).components(separatedBy: ",").first?.trimmingCharacters(in: .whitespaces) ?? ""
             let query = "\(cleanTitle) \(cleanArtist)"
             
             let results = await YTMusicService.shared.search(query: query)
             let explode = await YTMusicService.shared.explodeSearch(query: "\(query) audio")
             
-            var allCandidates = [String: Song]()
+            var allCandidates = [String: YTTrack]()
             for r in results + explode {
                 allCandidates[r.id] = r
             }
@@ -180,8 +180,8 @@ class TrackMatcherService {
             var scoredList = [ScoredTrackMatch]()
             
             for cand in allCandidates.values {
-                let score = scoreCandidate(candidate: cand, target: targetSong)
-                let tDur = Int(targetSong.duration)
+                let score = scoreCandidate(candidate: cand, target: targetYTTrack)
+                let tDur = Int(targetYTTrack.duration)
                 let cDur = Int(cand.duration)
                 
                 let diff = (tDur > 0 && cDur > 0) ? abs(tDur - cDur) : 0
@@ -198,7 +198,7 @@ class TrackMatcherService {
                 }
                 
                 scoredList.append(ScoredTrackMatch(
-                    song: cand,
+                    YTTrack: cand,
                     score: score,
                     durationDiffSeconds: diff,
                     qualityLabel: label,

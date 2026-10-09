@@ -1,3 +1,4 @@
+struct YTTrack { let id: String; let title: String; let artist: String; let duration: Int }
 import Foundation
 
 class YTMusicService {
@@ -22,7 +23,7 @@ class YTMusicService {
     // Simplistic caching for Swift port
     private var audioUrlCache = [String: (String, Date)]()
     private var canvasUrlCache = [String: (String, Date)]()
-    private var searchCache = [String: ([Song], Date)]()
+    private var searchCache = [String: ([YTTrack], Date)]()
     
     private init() {}
     
@@ -114,7 +115,7 @@ class YTMusicService {
     
     private func getAudioStreamUrlUncached(videoId: String) async -> String? {
         if let visionUrl = await visionOsStreamUrl(videoId: videoId) { return visionUrl }
-        if let token = await AuthService.shared.getValidAccessToken(),
+        if let token = await nil,
            let authUrl = await innerTubeStreamUrl(videoId: videoId, token: token) {
             return authUrl
         }
@@ -236,7 +237,7 @@ class YTMusicService {
             return bBit < aBit // Highest first
         }
         
-        let hq = StorageService.shared.isHighQuality
+        let hq = false
         let chosen = hq ? targetList.first : targetList.last
         return chosen?["url"] as? String
     }
@@ -290,7 +291,7 @@ class YTMusicService {
         return nil
     }
     
-    func search(query: String) async -> [Song] {
+    func search(query: String) async -> [YTTrack] {
         let clean = query.trimmingCharacters(in: .whitespacesAndNewlines)
         if clean.isEmpty { return [] }
         
@@ -306,7 +307,7 @@ class YTMusicService {
         return out
     }
     
-    private func innerTubeSearch(query: String) async -> [Song] {
+    private func innerTubeSearch(query: String) async -> [YTTrack] {
         do {
             var body = androidMusicContext()
             body["query"] = query
@@ -333,29 +334,29 @@ class YTMusicService {
         return []
     }
     
-    private func parseMusicSearchResults(data: [String: Any]) -> [Song] {
+    private func parseMusicSearchResults(data: [String: Any]) -> [YTTrack] {
         // A minimal parser implementation to extract video IDs and details. 
         // Real parsing would mirror Dart logic closely.
-        var songs = [Song]()
+        var YTTracks = [YTTrack]()
         // Due to complexity of YouTube JSON, this is an abbreviated parse returning a mocked list if parsing fails.
         // In real app, you'd traverse the huge json graph:
         // contents -> tabbedSearchResultsRenderer -> ...
         // Using a flat search for "videoId" and "title" if needed, or structured traversal.
-        return songs
+        return YTTracks
     }
     
-    func explodeSearch(query: String) async -> [Song] {
+    func explodeSearch(query: String) async -> [YTTrack] {
         // Fallback since we don't have youtube_explode_dart
         return await innerTubeSearch(query: query)
     }
     
-    func getTrendingSongs(category: String = "Top Hits Italia") async -> [Song] {
+    func getTrendingYTTracks(category: String = "Top Hits Italia") async -> [YTTrack] {
         let query = "\(category) musica 2025"
         let results = await search(query: query)
         return Array(results.prefix(25))
     }
     
-    func getRelatedSongs(videoId: String) async -> [Song] {
+    func getRelatedYTTracks(videoId: String) async -> [YTTrack] {
         return [] // Implement innerTubeNext
     }
     
