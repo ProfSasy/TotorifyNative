@@ -5,7 +5,7 @@ import AVFoundation
 class AudioEngine: NSObject, ObservableObject, WKNavigationDelegate {
     static let shared = AudioEngine()
     
-    private var webView: WKWebView!
+    var webView: WKWebView!
     @Published var isPlaying = false
     @Published var currentPosition: Double = 0
     @Published var duration: Double = 0
@@ -91,5 +91,9 @@ class AudioEngine: NSObject, ObservableObject, WKNavigationDelegate {
                 }
             }
         }
+    }
+    func resume() {
+        webView.evaluateJavaScript("document.querySelector('video').play();")
+        isPlaying = true
     }
 }

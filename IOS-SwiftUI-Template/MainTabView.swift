@@ -1,36 +1,63 @@
 import SwiftUI
 
 struct MainTabView: View {
-    @StateObject private var audioEngine = AudioEngine.shared
+    @State private var selectedTab = 0
+    @State private var showFullPlayer = false
+    @ObservedObject var audioEngine = AudioEngine.shared
+    
+    // Un colore giallo simile a Demus
+    let accentColor = Color(red: 1.0, green: 0.7, blue: 0.0)
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            TabView {
-                LibraryView()
-                    .tabItem {
-                        Image(systemName: "music.note.list")
-                        Text("La tua musica")
-                    }
-                
-                SearchView()
+            TabView(selection: $selectedTab) {
+                HomeView()
                     .tabItem {
                         Image(systemName: "magnifyingglass")
-                        Text("Cerca")
+                        Text("Aggiungi")
                     }
+                    .tag(0)
                 
-                SettingsView()
+                Text("Brani")
                     .tabItem {
-                        Image(systemName: "gear")
-                        Text("Impostazioni")
+                        Image(systemName: "music.note")
+                        Text("Brani")
                     }
+                    .tag(1)
+                
+                Text("Album")
+                    .tabItem {
+                        Image(systemName: "square.stack")
+                        Text("Album")
+                    }
+                    .tag(2)
+                
+                Text("Artisti")
+                    .tabItem {
+                        Image(systemName: "mic")
+                        Text("Artisti")
+                    }
+                    .tag(3)
+                
+                Text("Playlist")
+                    .tabItem {
+                        Image(systemName: "music.note.list")
+                        Text("Playlist")
+                    }
+                    .tag(4)
             }
-            .accentColor(Color(red: 0.9, green: 0.2, blue: 0.2)) // Colore stile Demus
+            .accentColor(accentColor)
             
-            // Mini Player Overlay (Mostrato sempre sopra le tab)
+            // Mini Player Floating
             if audioEngine.currentVideoId != nil {
-                MiniPlayerView()
-                    .offset(y: -49) // Offset per stare sopra la TabBar
+                MiniPlayerView(showFullPlayer: $showFullPlayer)
+                    .padding(.bottom, 50) // Sopra la tab bar
+                    .padding(.horizontal, 10)
             }
         }
+        .fullScreenCover(isPresented: $showFullPlayer) {
+            FullPlayerView(showFullPlayer: $showFullPlayer)
+        }
+        .preferredColorScheme(.dark)
     }
 }

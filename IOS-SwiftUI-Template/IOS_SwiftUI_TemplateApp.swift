@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 @main
 struct TotorifyNativeApp: App {
@@ -7,5 +8,6 @@ struct TotorifyNativeApp: App {
             MainTabView()
                 .preferredColorScheme(.dark)
         }
+        .modelContainer(for: [TotorSong.self, TotorPlaylist.self])
     }
 }

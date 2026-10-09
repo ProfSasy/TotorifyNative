@@ -2,7 +2,7 @@ name: TotorifyNative
 options:
   bundleIdPrefix: com.profsasy
   deploymentTarget:
-    iOS: 15.0
+    iOS: 17.0
 targets:
   TotorifyNative:
     type: application
