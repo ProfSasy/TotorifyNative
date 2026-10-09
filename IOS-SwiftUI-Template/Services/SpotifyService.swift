@@ -225,16 +225,7 @@ class SpotifyService {
                             coverUrl = firstImage["url"] as? String
                         }
                         
-                        result.append(SpotifyTrack(
-                            id: "spotify_\(id)",
-                            title: title,
-                            artist: artists,
-                            album: albumName,
-                            duration: Double(durationMs) / 1000.0,
-                            thumbnailUrl: coverUrl ?? "",
-                            spotifyTrackId: id,
-                            /* no yt id */
-                        ))
+                        result.append(SpotifyTrack(trackId: id, title: title, artist: artists, album: albumName, durationMs: durationMs, coverUrl: coverUrl))
                     }
                     return result
                 }
@@ -247,4 +238,5 @@ class SpotifyService {
         return []
     }
 }
+
 

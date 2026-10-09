@@ -77,10 +77,6 @@ class AudioEngine: NSObject, ObservableObject, WKNavigationDelegate {
         isPlaying = false
     }
     
-    func resume() {
-        webView.evaluateJavaScript("document.querySelector('video').play();")
-        isPlaying = true
-    }
     
     // Polling per aggiornare la UI
     func startPolling() {
@@ -92,8 +88,6 @@ class AudioEngine: NSObject, ObservableObject, WKNavigationDelegate {
             }
         }
     }
-    func resume() {
-        webView.evaluateJavaScript("document.querySelector('video').play();")
-        isPlaying = true
-    }
 }
+
+

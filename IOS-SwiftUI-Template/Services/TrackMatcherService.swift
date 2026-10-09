@@ -57,7 +57,7 @@ class TrackMatcherService {
         let targetTitle = canonicalTitle(target.title)
         let candTitle = canonicalTitle(candidate.title)
         
-        let tDur = Int(target.duration)
+        let tDur = target.durationMs / 1000
         let cDur = Int(candidate.duration)
         
         let diff = (tDur > 0 && cDur > 0) ? abs(tDur - cDur) : 0
@@ -98,7 +98,7 @@ class TrackMatcherService {
         var highestScore = -999999
         
         for cand in candidates {
-            let s = scoreCandidate(candidate: cand, target: target)
+            let s = scoreCandidate(candidate: cand, target: track)
             if s > highestScore {
                 highestScore = s
                 bestYTTrack = cand
@@ -122,8 +122,8 @@ class TrackMatcherService {
         }
         
         do {
-            let cleanTitle = canonicalTitle(track.title)
-            let cleanArtist = canonicalArtist(track.artist).components(separatedBy: ",").first?.trimmingCharacters(in: .whitespaces) ?? ""
+            let cleanTitle = canonicalTitle(target.title)
+            let cleanArtist = canonicalArtist(target.artist).components(separatedBy: ",").first?.trimmingCharacters(in: .whitespaces) ?? ""
             
             let queryMusic = "\(cleanTitle) \(cleanArtist)"
             let queryTube = "\(track.title) \(track.artist) audio"
@@ -144,7 +144,7 @@ class TrackMatcherService {
             var bestScore = -999999
             
             for cand in allCandidates {
-                let score = scoreCandidate(candidate: cand, target: target)
+                let score = scoreCandidate(candidate: cand, target: track)
                 if score > bestScore {
                     bestScore = score
                     best = cand
@@ -180,7 +180,7 @@ class TrackMatcherService {
             
             for cand in allCandidates.values {
                 let score = scoreCandidate(candidate: cand, target: targetYTTrack)
-                let tDur = Int(target.durationMs)
+                let tDur = targetYTTrack.duration
                 let cDur = Int(cand.duration)
                 
                 let diff = (tDur > 0 && cDur > 0) ? abs(tDur - cDur) : 0
@@ -213,3 +213,11 @@ class TrackMatcherService {
         }
     }
 }
+
+    func scoreCandidate(candidate: YTTrack, target: YTTrack) -> Int {
+        let cDur = candidate.duration
+        let tDur = target.duration
+        let diff = (tDur > 0 && cDur > 0) ? abs(tDur - cDur) : 0
+        return diff
+    }
+
