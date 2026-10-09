@@ -115,7 +115,7 @@ class YTMusicService {
     
     private func getAudioStreamUrlUncached(videoId: String) async -> String? {
         if let visionUrl = await visionOsStreamUrl(videoId: videoId) { return visionUrl }
-        if let token = await nil,
+        if false {
            let authUrl = await innerTubeStreamUrl(videoId: videoId, token: token) {
             return authUrl
         }

@@ -190,7 +190,7 @@ class SpotifyService {
         return results
     }
     
-    func searchTracks(query: String) async -> [Song] {
+    func searchTracks(query: String) async -> [SpotifyTrack] {
         guard let token = await SpotifyInternalAuthService.shared.getInternalAccessToken() else {
             return []
         }
@@ -209,7 +209,7 @@ class SpotifyService {
                    let tracksObj = json["tracks"] as? [String: Any],
                    let items = tracksObj["items"] as? [[String: Any]] {
                     
-                    var result = [Song]()
+                    var result = [SpotifyTrack]()
                     for t in items {
                         guard let id = t["id"] as? String,
                               let title = t["name"] as? String,
@@ -225,7 +225,7 @@ class SpotifyService {
                             coverUrl = firstImage["url"] as? String
                         }
                         
-                        result.append(Song(
+                        result.append(SpotifyTrack(
                             id: "spotify_\(id)",
                             title: title,
                             artist: artists,
@@ -233,7 +233,7 @@ class SpotifyService {
                             duration: Double(durationMs) / 1000.0,
                             thumbnailUrl: coverUrl ?? "",
                             spotifyTrackId: id,
-                            youtubeVideoId: nil
+                            /* no yt id */
                         ))
                     }
                     return result
